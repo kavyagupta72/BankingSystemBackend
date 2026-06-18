@@ -26,14 +26,17 @@ const userSchema = new mongoose.Schema({
 })
 
 userSchema.pre("save",async function(next){
-    if(!this.isModified("password")){
+    if(!this.isModified("password")){       //if password is not modified, do not hash it, move to next middleware
         return next()
     }
-    const hash = await bcrypt.hash(this.password,10)
+    const hash = await bcrypt.hash(this.password,10)    //10 rounds of hashing
     this.password = hash
     return next()
 })
 
 userSchema.methods.comparePassword = async function(password){
-    
+    return await bcrypt.compare(password, this.password)
 }
+
+const userModel = mongoose.model("User",userSchema)
+module.exports = userModel
